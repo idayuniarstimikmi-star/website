@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mendaftarkan Toko | LokaMart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #007bff;
+            --light-gray: #f4f4f4;
+            --text-dark: #333;
+            --error-red: #dc3545;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            background-color: var(--light-gray);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .search-box input {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            width: 250px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        /* ===== HEADER & FOOTER (Gaya Tetap) ===== */
+        .header { background-color: var(--primary-blue); color: white; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { display: flex; align-items: center; font-size: 1.5em; font-weight: 700; }
+        .search-container { flex-grow: 1; margin: 0 40px; max-width: 600px; }
+        .search-box { display: flex; background-color: white; border-radius: 5px; overflow: hidden; }
+        .search-box input { padding: 10px 15px; border: none; width: 100%; outline: none; color: var(--text-dark); }
+        .search-box button { background-color: #0069d9; color: white; border: none; padding: 0 15px; cursor: pointer; font-size: 1.2em; }
+        .header-nav a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; }
+
+        .main-content { flex-grow: 1; padding: 40px 0; display: flex; flex-direction: column; align-items: center; }
+        .form-container { background-color: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); width: 100%; max-width: 500px; text-align: center; }
+        .form-container h1 { font-size: 2em; margin-bottom: 5px; color: var(--primary-blue); }
+        .form-container p { margin-bottom: 30px; color: #666; }
+
+        /* --- Input Group & Validation --- */
+        .input-group { text-align: left; margin-bottom: 20px; position: relative; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 5px; }
+        .input-group input[type="text"], .input-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 1em; outline: none; transition: border-color 0.3s; }
+        .input-group input:focus, .input-group textarea:focus { border-color: var(--primary-blue); }
+        
+        .input-group.error input,
+        .input-group.error textarea { border-color: var(--error-red); }
+        .error-message { color: var(--error-red); font-size: 0.85em; margin-top: 5px; display: none; }
+        .input-group.error .error-message { display: block; }
+        
+        .input-group textarea { resize: vertical; min-height: 100px; }
+        
+        /* --- Avatar Uploader --- */
+        .avatar-uploader { text-align: center; margin-bottom: 30px; }
+        .avatar-placeholder { width: 100px; height: 100px; background-color: #e0e0e0; border-radius: 50%; margin: 0 auto 10px; display: flex; justify-content: center; align-items: center; font-size: 3em; color: #aaa; overflow: hidden; }
+        .avatar-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-pilih-gambar { background-color: var(--light-gray); border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em; color: var(--text-dark); margin-bottom: 5px; }
+        #avatar-file-input { display: none; } 
+
+        .btn-submit { width: 100%; padding: 15px; background-color: var(--primary-blue); color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: background-color 0.3s; }
+        .btn-submit:hover { background-color: #0056b3; }
+
+        .footer { background-color: var(--primary-blue); color: white; padding: 30px 50px; display: flex; justify-content: space-between; margin-top: auto; }
+        .footer-col { max-width: 300px; }
+        .footer-logo { font-size: 1.5em; font-weight: 700; }
+        .footer-links a { color: white; text-decoration: none; display: block; margin-bottom: 5px; font-size: 0.9em; }
+        .social-media a { color: white; font-size: 1.2em; margin-right: 15px; }
+
+        /* --- Perbaikan CSS untuk Dropdown Akun --- */
+        .dropdown-account {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu {
+            display: none; /* Sembunyikan default */
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            border-radius: 5px;
+            padding: 8px 0;
+            top: 45px; /* Jarak dari header */
+        }
+        /* Override header-nav a style untuk item di dropdown */
+        .dropdown-menu a {
+            color: var(--text-dark);
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            font-weight: 400;
+            font-size: 0.95em;
+            margin-left: 0; 
+        }
+        .dropdown-menu a:hover {
+            background-color: var(--light-gray);
+        }
+        .dropdown-menu .dropdown-header {
+            font-weight: 600;
+            color: var(--primary-blue);
+            border-bottom: 1px solid #eee;
+            margin-bottom: 5px;
+            padding: 10px 15px;
+            display: block;
+            text-align: left;
+        }
+        .dropdown-menu .dropdown-divider {
+            height: 1px;
+            margin: 5px 0;
+            overflow: hidden;
+            background-color: #e9ecef;
+        }
+        .dropdown-account a#account-dropdown-toggle {
+            display: flex; /* Untuk ikon dan teks */
+            align-items: center;
+        }
+        .dropdown-account a#account-dropdown-toggle span {
+            /* Pastikan teks "Akun" terlihat normal di header */
+            font-weight: 500;
+        }
+        /* Akhir Perbaikan CSS Dropdown */
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo-text"><i class="fas fa-shopping-cart" style="margin-right: 8px;"></i> LokaMart</div>
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Cari barang atau toko..." />
+                <button><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        <div class="header-nav">
+            <a href="#"><i class="fas fa-bell"></i></a>
+            
+            <div class="dropdown-account">
+                <a href="#" id="account-dropdown-toggle">
+                    <i class="fas fa-user-circle"></i> 
+                    <span id="header-account-name">Akun</span> <i class="fas fa-caret-down"></i>
+                </a>
+                <div class="dropdown-menu" id="account-dropdown-menu">
+                    <span class="dropdown-header" id="dropdown-store-name">Akun Pengguna</span> 
+                    <a href="Dasboard toko.html">Dashboard Toko</a>
+                    <a href="registrasi daftar toko.html">Pengaturan Akun</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" id="logout-button">Keluar</a>
+                </div>
+            </div>
+            </div>
+    </div>
+
+    <div class="main-content">
+        <div class="form-container">
+            <h1>Ayo, Mulai Berjualan di LokaMart</h1>
+            <p>Selamat datang! Kami siap membantu mengembangkan usaha Anda. Daftarkan toko Anda sekarang untuk mulai menjual produk lokal terbaik Anda.</p>
+            
+            <form id="register-form">
+                <div class="avatar-uploader">
+                    <div class="avatar-placeholder" id="avatar-preview">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <input type="file" id="avatar-file-input" accept="image/jpeg, image/png"> 
+                    <button type="button" class="btn-pilih-gambar" id="btn-pilih-gambar">Pilih Gambar</button>
+                    <p style="font-size: 0.8em; color: #888;">Ukuran gambar: maks 1 MB | Format gambar: JPEG, PNG</p>
+                </div>
+                
+                <div class="input-group" id="group-nama-toko">
+                    <label for="nama-toko">Nama toko <span style="color:var(--error-red);">*</span></label>
+                    <input type="text" id="nama-toko" placeholder="Masukkan nama toko">
+                    <span class="error-message">Nama toko wajib diisi.</span>
+                </div>
+
+                <div class="input-group" id="group-deskripsi">
+                    <label for="deskripsi">Deskripsi singkat <span style="color:var(--error-red);">*</span></label>
+                    <textarea id="deskripsi" placeholder="Masukkan deskripsi toko"></textarea>
+                    <span class="error-message">Deskripsi wajib diisi.</span>
+                </div>
+
+                <div class="input-group" id="group-whatsapp">
+                    <label for="whatsapp">Nomor WhatsApp <span style="color:var(--error-red);">*</span></label>
+                    <input type="text" id="whatsapp" placeholder="Contoh: +62 812-3456-7890">
+                    <span class="error-message">Nomor WhatsApp wajib diisi.</span>
+                </div>
+
+                <div class="input-group" id="group-alamat">
+                    <label for="alamat">Alamat <span style="color:var(--error-red);">*</span></label>
+                    <input type="text" id="alamat" placeholder="Masukkan alamat toko">
+                    <span class="error-message">Alamat wajib diisi.</span>
+                </div>
+
+                <button type="submit" class="btn-submit">Buat Toko Saya</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-col">
+            <div class="footer-logo">LokaMart</div>
+            <a href="#">Kebijakan Privasi & Penggunaan</a>
+            <a href="#">Pusat Bantuan</a>
+            <p style="font-size: 0.9em; margin-top: 15px;">(025) 456-7890</p>
+            <div class="social-media" style="margin-top: 10px;">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+        <div class="footer-links">
+            <a href="Index.html" id="btnBeranda">Beranda</a>
+            <a href="Tentang kami" id="btnTentangKami">Tentang Kami</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('register-form');
+            const requiredFields = ['nama-toko', 'deskripsi', 'whatsapp', 'alamat'];
+            const fileInput = document.getElementById('avatar-file-input');
+            const avatarPreview = document.getElementById('avatar-preview');
+            const btnSubmit = document.querySelector('.btn-submit');
+            
+            // Elemen Dropdown Baru
+            const accountToggle = document.getElementById('account-dropdown-toggle');
+            const dropdownMenu = document.getElementById('account-dropdown-menu');
+            const dropdownStoreName = document.getElementById('dropdown-store-name');
+
+            let avatarBase64 = ''; 
+
+            // Fungsi Validasi & Error (Tidak Diubah)
+            function showError(fieldId, message) {
+                const inputGroup = document.getElementById('group-' + fieldId);
+                const errorMessage = inputGroup.querySelector('.error-message');
+                if (inputGroup) inputGroup.classList.add('error');
+                if (errorMessage) errorMessage.textContent = message || `${fieldId.replace('-', ' ')} wajib diisi.`;
+            }
+            function clearError(fieldId) {
+                const inputGroup = document.getElementById('group-' + fieldId);
+                if (inputGroup) inputGroup.classList.remove('error');
+            }
+
+            // Logika Uploader Avatar (Tidak Diubah)
+            document.getElementById('btn-pilih-gambar').addEventListener('click', () => fileInput.click());
+
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        avatarBase64 = e.target.result; // Simpan Base64 string
+                        avatarPreview.innerHTML = '';
+                        const img = document.createElement('img');
+                        img.src = avatarBase64;
+                        img.alt = 'Avatar Toko Preview';
+                        avatarPreview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    avatarBase64 = '';
+                    avatarPreview.innerHTML = '<i class="fas fa-user"></i>';
+                }
+            });
+
+            // Aksi saat form registrasi disubmit (Tidak Diubah)
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); 
+                let isValid = true;
+                
+                // 1. Validasi
+                requiredFields.forEach(fieldId => {
+                    const input = document.getElementById(fieldId);
+                    if (input.value.trim() === '') {
+                        showError(fieldId);
+                        isValid = false;
+                    } else {
+                        clearError(fieldId);
+                    }
+                });
+
+                // 2. Jika Valid, Simpan dan Pindah
+                if (isValid) {
+                    let existingData = JSON.parse(localStorage.getItem('lokamart_store_data') || '{}');
+                    
+                    const storeData = {
+                        namaToko: document.getElementById('nama-toko').value.trim(),
+                        deskripsi: document.getElementById('deskripsi').value.trim(),
+                        whatsapp: document.getElementById('whatsapp').value.trim(),
+                        alamat: document.getElementById('alamat').value.trim(),
+                        // Gunakan gambar baru jika ada
+                        avatar: avatarBase64 || existingData.avatar || '', 
+                        // Catat tanggal terdaftar hanya jika belum pernah ada
+                        terdaftar: existingData.terdaftar || new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+                    };
+
+                    // Simpan data toko ke localStorage
+                    localStorage.setItem('lokamart_store_data', JSON.stringify(storeData));
+
+                    alert(`Registrasi Toko.html "${storeData.namaToko}" Berhasil! Anda akan diarahkan ke Dashboard Toko.`);
+                    
+                    // Arahkan ke halaman Dashboard
+                    window.location.href = 'Dasboard toko.html'; 
+                } else {
+                    alert('Mohon lengkapi semua kolom yang wajib diisi.');
+                }
+            });
+
+            // LOGIKA MUAT DATA & UPDATE NAMA AKUN DI DROPDOWN
+            function loadStoreDataToForm() {
+                const dataString = localStorage.getItem('lokamart_store_data');
+                const data = dataString ? JSON.parse(dataString) : null;
+
+                if (data && data.namaToko) {
+                    // Mengisi form
+                    document.getElementById('nama-toko').value = data.namaToko || '';
+                    document.getElementById('deskripsi').value = data.deskripsi || '';
+                    document.getElementById('whatsapp').value = data.whatsapp || '';
+                    document.getElementById('alamat').value = data.alamat || '';
+                    
+                    // >>> FOKUS: UPDATE NAMA TOKO DI DROPDOWN <<<
+                    if (dropdownStoreName) {
+                        dropdownStoreName.textContent = data.namaToko;
+                    }
+                    
+                    // Update UI untuk mode edit
+                    document.querySelector('.form-container h1').textContent = `Edit Profil Toko ${data.namaToko}`;
+                    if(btnSubmit) btnSubmit.textContent = 'Simpan Perubahan';
+                    document.title = 'Edit Profil Toko | LokaMart';
+                    
+                    if (data.avatar) {
+                        avatarBase64 = data.avatar; 
+                        avatarPreview.innerHTML = '';
+                        const img = document.createElement('img');
+                        img.src = data.avatar;
+                        img.alt = 'Avatar Toko Preview';
+                        avatarPreview.appendChild(img);
+                    }
+                }
+            }
+            
+            // --- LOGIKA DROPDOWN AKUN BARU ---
+            if(accountToggle && dropdownMenu) {
+                accountToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Toggle tampilan dropdown
+                    const isVisible = dropdownMenu.style.display === 'block';
+                    dropdownMenu.style.display = isVisible ? 'none' : 'block';
+                });
+
+                // Sembunyikan dropdown saat klik di luar
+                document.addEventListener('click', function(e) {
+                    // Cek jika klik bukan di dalam dropdown-account (tombol atau menu)
+                    const dropdownContainer = document.querySelector('.dropdown-account');
+                    if (dropdownContainer && !dropdownContainer.contains(e.target)) {
+                        dropdownMenu.style.display = 'none';
+                    }
+                });
+            }
+
+            // Tambahkan Logika Keluar (Contoh)
+            const logoutButton = document.getElementById('logout-button');
+            if(logoutButton) {
+                logoutButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Hapus data toko
+                    localStorage.removeItem('lokamart_store_data');
+                    alert('Anda telah keluar dari akun toko.');
+                    window.location.reload(); // Muat ulang halaman
+                });
+            }
+            
+            // Panggil saat halaman dimuat
+            loadStoreDataToForm();
+        });
+    </script>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = this.value.trim();
+                if (query !== "") {
+                    window.location.href = `daftar.html?search=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

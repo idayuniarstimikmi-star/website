@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LokaMart | List Produk</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="assets/images/logonew.jpg">
+
+  <style>
+    * { font-family: 'Poppins', sans-serif; }
+
+    body {
+      background-color: #f7f8fa;
+      color: #333;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: linear-gradient(90deg, #1C7ED6, #00ffe0);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border-bottom: 2px solid #00ffe0;
+    }
+    .navbar-brand, .nav-link {
+      color: white !important;
+      font-weight: 500;
+    }
+
+
+    /* Sidebar */
+    .filter-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      backdrop-filter: blur(10px);
+    }
+    .filter-card h5 {
+      color: #1C7ED6;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    /* Produk */
+    .product-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      cursor: pointer;
+    }
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    .product-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .product-info {
+      padding: 15px;
+    }
+    .product-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .product-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+    .product-price {
+      color: #1C7ED6;
+      font-weight: 700;
+    }
+
+    /* Tombol Aksi di dalam info */
+    .action-btns-inline {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .like-btn, .delete-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1.3rem;
+      transition: transform 0.2s ease;
+    }
+    .like-btn:hover, .delete-btn:hover {
+      transform: scale(1.2);
+    }
+    .like-btn i { color: #555; }
+    .like-btn.liked i { color: red; }
+    .delete-btn i { color: #888; }
+    .delete-btn:hover i { color: crimson; }
+
+    /* Footer */
+    footer {
+      background: linear-gradient(90deg, #1C7ED6, #1C7ED6);
+      color: white;
+      text-align: center;
+      padding: 40px 0;
+      margin-top: 80px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">🛒 LokaMart</a>
+    <form class="d-flex ms-auto w-50" role="search" id="searchForm">
+      <input class="form-control me-2" id="searchInput" type="search" placeholder="Cari produk di sini..." aria-label="Search">
+      <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
+    </form>
+  </div>
+</nav>
+
+<div class="container my-5">
+  <div class="row">
+    <div class="col-md-3 mb-4">
+      <div class="filter-card">
+        <h5>Tambah Produk Baru</h5>
+        <form id="uploadForm">
+          <div class="mb-3">
+            <label class="form-label">Nama Produk</label>
+            <input type="text" class="form-control" id="productName" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Harga (Rp)</label>
+            <input type="text" class="form-control" id="productPrice" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nama Toko</label>
+            <input type="text" class="form-control" id="productStore" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Foto Produk</label>
+            <input type="file" class="form-control" id="productImage" accept="image/*" required>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Tambah Produk</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <div class="row g-4" id="productGrid">
+        <div class="col-md-4 product-item">
+          <div class="product-card" data-name="Roti Coklat Lembut" data-price="15000" data-store="Toko Maju Jaya" data-img="https://images.unsplash.com/photo-1578985545062-69928b1d9587">
+            <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587" alt="Roti Coklat Lembut">
+            <div class="product-info">
+              <div class="product-header">
+                <div>
+                  <div class="product-title">Roti Coklat Lembut</div>
+                  <div class="product-price">Rp 15.000</div>
+                </div>
+                <div class="action-btns-inline">
+                  <button class="like-btn"><i class="bi bi-heart"></i></button>
+                  <button class="delete-btn"><i class="bi bi-trash"></i></button>
+                </div>
+              </div>
+              <small class="text-muted product-store">Toko Maju Jaya</small>
+            </div>
+          </div>
+        </div>
+
+      <div class="col-md-4 product-item">
+  <div class="product-card" data-name="Kursi Hias Bandung" data-price="75000" data-store="Footwear Lokal" data-img="https://images.unsplash.com/photo-1586023492125-27b2c045efd7">
+    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7" alt="Kursi Hias Bandung">
+    <div class="product-info">
+      <div class="product-header">
+        <div>
+          <div class="product-title">Kursi Hias Bandung </div>
+          <div class="product-price">Rp 175.000</div>
+        </div>
+        <div class="action-btns-inline">
+          <button class="like-btn"><i class="bi bi-heart"></i></button>
+          <button class="delete-btn"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+      <small class="text-muted product-store">Footwear Lokal</small>
+    </div>
+  </div>
+</div>
+       
+   <div class="col-md-4 product-item">
+  <div class="product-card" data-name="Sepatu Terbaru" data-price="20000" data-store="Sweet Treats" data-img="https://images.unsplash.com/photo-1544441893-675973e31985">
+    <img src="https://images.unsplash.com/photo-1544441893-675973e31985" alt="Sepatu Terbaru">
+    <div class="product-info">
+      <div class="product-header">
+        <div>
+          <div class="product-title">Sepatu Terbaru </div>
+          <div class="product-price">Rp 20.000</div>
+        </div>
+        <div class="action-btns-inline">
+          <button class="like-btn"><i class="bi bi-heart"></i></button>
+          <button class="delete-btn"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+      <small class="text-muted product-store">Sweet Treats</small>
+    </div>
+  </div>
+</div>    
+
+<div class="col-md-4 product-item">
+  <div class="product-card" data-name="Sepatu Olahraga" data-price="22000" data-store="Produk Alam" data-img="https://images.unsplash.com/photo-1556906781-9a412961c28c">
+    <img src="https://images.unsplash.com/photo-1556906781-9a412961c28c" alt="Sepatu Olahraga">
+    <div class="product-info">
+      <div class="product-header">
+        <div>
+          <div class="product-title">Sepatu Olahraga</div>
+          <div class="product-price">Rp 122.000</div>
+        </div>
+        <div class="action-btns-inline">
+          <button class="like-btn"><i class="bi bi-heart"></i></button>
+          <button class="delete-btn"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+      <small class="text-muted product-store">Produk Alam</small>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-4 product-item">
+  <div class="product-card" data-name="Jam Tangan" data-price="35000" data-store="Aksesoris Kreatif" data-img="https://images.unsplash.com/photo-1523275335684-37898b6baf30">
+    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30" alt="Jam Tangan">
+    <div class="product-info">
+      <div class="product-header">
+        <div>
+          <div class="product-title">Jam Tangan </div>
+          <div class="product-price">Rp 35.000</div>
+        </div>
+        <div class="action-btns-inline">
+          <button class="like-btn"><i class="bi bi-heart"></i></button>
+          <button class="delete-btn"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+      <small class="text-muted product-store">Aksesoris Kreatif</small>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-4 product-item">
+  <div class="product-card" data-name="Panci" data-price="40000" data-store="Craft Indonesia" data-img="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136">
+    <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136" alt="Panci">
+    <div class="product-info">
+      <div class="product-header">
+        <div>
+          <div class="product-title">Panci </div>
+          <div class="product-price">Rp 140.000</div>
+        </div>
+        <div class="action-btns-inline">
+          <button class="like-btn"><i class="bi bi-heart"></i></button>
+          <button class="delete-btn"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+      <small class="text-muted product-store">Craft Indonesia</small>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-4 product-item">
+  <div class="product-card" data-name="Baju Batik Modern" data-price="50000" data-store="Fashion Lokal" data-img="https://images.unsplash.com/photo-1441986300917-64674bd600d8">
+    <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8" alt="Baju Batik Modern">
+    <div class="product-info">
+      <div class="product-header">
+        <div>
+          <div class="product-title">Baju Batik Modern</div>
+          <div class="product-price">Rp 50.000</div>
+        </div>
+        <div class="action-btns-inline">
+          <button class="like-btn"><i class="bi bi-heart"></i></button>
+          <button class="delete-btn"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+      <small class="text-muted product-store">Fashion Lokal</small>
+    </div>
+  </div>
+</div>
+
+<div class="col-md-4 product-item">
+  <div class="product-card" data-name="Kopi Arabika" data-price="25000" data-store="Kopi Nusantara" data-img="https://images.unsplash.com/photo-1509042239860-f550ce710b93">
+    <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93" alt="Kopi Arabika">
+    <div class="product-info">
+      <div class="product-header">
+        <div>
+          <div class="product-title">Kopi Arabika</div>
+          <div class="product-price">Rp 25.000</div>
+        </div>
+        <div class="action-btns-inline">
+          <button class="like-btn"><i class="bi bi-heart"></i></button>
+          <button class="delete-btn"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+      <small class="text-muted product-store">Kopi Nusantara</small>
+    </div>
+  </div>
+</div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2025 LokaMart | Dukung UMKM Indonesia</p>
+</footer>
+
+<script>
+  const grid = document.getElementById("productGrid");
+  const searchInput = document.getElementById("searchInput");
+  const searchForm = document.getElementById("searchForm");
+  const uploadForm = document.getElementById("uploadForm");
+
+  /**
+   * Fungsi untuk membuat elemen HTML card produk baru
+   * @param {string} name - Nama produk
+   * @param {number} price - Harga produk (dalam angka)
+   * @param {string} store - Nama toko
+   * @param {string} imgUrl - Data URL gambar
+   * @returns {HTMLElement} - Elemen div produk (product-item)
+   */
+  function createProductCard(name, price, store, imgUrl) {
+    const formattedPrice = parseInt(price).toLocaleString('id-ID');
+
+    const card = document.createElement("div");
+    card.className = "col-md-4 product-item";
+    
+    // Pastikan semua data atribut ada
+    card.innerHTML = `
+      <div class="product-card" data-name="${name}" data-price="${price}" data-store="${store}" data-img="${imgUrl}">
+        <img src="${imgUrl}" alt="${name}">
+        <div class="product-info">
+          <div class="product-header">
+            <div>
+              <div class="product-title">${name}</div>
+              <div class="product-price">Rp ${formattedPrice}</div>
+            </div>
+            <div class="action-btns-inline">
+              <button class="like-btn"><i class="bi bi-heart"></i></button>
+              <button class="delete-btn"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+          <small class="text-muted product-store">${store}</small>
+        </div>
+      </div>
+    `;
+    return card;
+  }
+
+  // 1. Tambah produk baru
+  uploadForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const name = productName.value;
+    const price = productPrice.value;
+    const store = productStore.value;
+    const imageInput = productImage.files[0];
+
+    if (imageInput) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        // Buat kartu produk baru
+        const newProduct = createProductCard(name, price, store, event.target.result);
+        
+        // Tambahkan di awal grid
+        grid.prepend(newProduct);
+        uploadForm.reset();
+      };
+      reader.readAsDataURL(imageInput);
+    }
+  });
+
+
+  // 2. Fungsionalitas Aksi (Like/Hapus/Detail) - menggunakan event delegation pada document
+  document.addEventListener("click", function(e) {
+    
+    // Aksi LIKE
+    if (e.target.closest(".like-btn")) {
+      const btn = e.target.closest(".like-btn");
+      btn.classList.toggle("liked");
+      btn.innerHTML = btn.classList.contains("liked")
+        ? '<i class="bi bi-heart-fill"></i>'
+        : '<i class="bi bi-heart"></i>';
+      e.stopPropagation(); // Sangat penting agar klik ini tidak memicu detail produk
+      return;
+    }
+
+    // Aksi HAPUS
+    if (e.target.closest(".delete-btn")) {
+      e.target.closest(".product-item").remove();
+      e.stopPropagation(); // Sangat penting agar klik ini tidak memicu detail produk
+      return;
+    }
+
+    // Aksi DETAIL PRODUK (jika klik di area kartu tapi bukan tombol aksi)
+    const card = e.target.closest(".product-card");
+    if (card) {
+      // Ambil data atribut dari produk yang baru ditambahkan/produk awal
+      const name = encodeURIComponent(card.dataset.name);
+      const price = encodeURIComponent(card.dataset.price);
+      const img = encodeURIComponent(card.dataset.img);
+      const store = encodeURIComponent(card.dataset.store || 'Toko Tidak Diketahui'); // Fallback jika data-store tidak ada
+      
+      // Mengirim semua data ke detail.html
+      window.location.href = `detail.html?name=${name}&price=${price}&img=${img}&store=${store}`;
+    }
+  });
+
+  // 3. Fitur cari produk
+  searchInput.addEventListener("keyup", function() {
+    const filter = searchInput.value.toLowerCase();
+    const items = document.querySelectorAll(".product-item");
+    items.forEach(item => {
+      const name = item.querySelector(".product-title").innerText.toLowerCase();
+      const store = item.querySelector(".product-store").innerText.toLowerCase();
+
+      // Cari di Nama Produk atau Nama Toko
+      const isMatch = name.includes(filter) || store.includes(filter);
+
+      item.style.display = isMatch ? "" : "none";
+    });
+  });
+
+  // 4. Mencegah submit form pencarian
+  searchForm.addEventListener("submit", e => e.preventDefault());
+</script>
+</body>
+</html>

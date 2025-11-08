@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Dashboard Toko | LokaMart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #007bff;
+            --light-gray: #f4f4f4;
+            --text-dark: #333;
+            --error-red: #007bff; 
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            background-color: var(--light-gray);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER & FOOTER (Gaya Tetap) ===== */
+        .header { background-color: var(--primary-blue); color: white; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { display: flex; align-items: center; font-size: 1.5em; font-weight: 700; }
+        .search-container { flex-grow: 1; margin: 0 40px; max-width: 600px; }
+        .search-box { display: flex; background-color: white; border-radius: 5px; overflow: hidden; }
+        .search-box input { padding: 10px 15px; border: none; width: 100%; outline: none; color: var(--text-dark); }
+        .search-box button { background-color: #0069d9; color: white; border: none; padding: 0 15px; cursor: pointer; font-size: 1.2em; }
+        .header-nav a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; }
+
+        .main-content { flex-grow: 1; padding: 40px 0; display: flex; flex-direction: column; align-items: center; }
+        
+        /* --- Dashboard Specific Styles --- */
+        .page-container { 
+            background-color: white; 
+            padding: 50px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+            width: 100%; 
+            max-width: 900px; 
+        }
+
+        .dash-content {
+            display: flex;
+            gap: 30px;
+            text-align: left;
+        }
+
+        .dash-left { flex-shrink: 0; text-align: center; }
+        .dash-info { flex-grow: 1; }
+
+        .dash-avatar-wrapper {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid #fff; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .dash-avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Gaya Tombol Edit Foto (MERAH) */
+        .btn-edit-foto {
+            background-color: var(--error-red); /* MERAH */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: background-color 0.3s;
+        }
+        .btn-edit-foto:hover {
+            background-color: #2acaea;
+        }
+        /* Akhir Gaya Tombol Edit Foto */
+
+        .dash-info h2 { 
+            font-size: 1.8em; 
+            margin: 0 0 10px 0; 
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+        .dash-info p { 
+            line-height: 1.6; 
+            color: #666; 
+            font-size: 0.95em; 
+            margin-bottom: 20px;
+        }
+        .dash-info-grid {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 10px 20px;
+            margin-top: 20px;
+        }
+        .dash-info-grid strong { font-weight: 600; color: #333; }
+        .dash-info-grid span { color: #555; }
+        
+        .products-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .products-section h3 {
+            font-size: 1.5em;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+        .product-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .product-card {
+            width: 180px;
+            height: 250px; 
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            position: relative; 
+            overflow: hidden; /* Penting untuk footer */
+        }
+        
+        /* Gaya untuk tempat tombol "Tambah Produk" dan input file */
+        .add-product-container {
+            position: relative;
+        }
+
+        /* Gaya untuk kartu "Tambah Produk" */
+        .add-product-card {
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+            border: 2px dashed #ccc;
+            background-color: #fff;
+        }
+
+        /* Gaya untuk gambar preview */
+        .product-image-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* Gaya untuk input file yang tersembunyi */
+        #product-image-upload {
+            display: none; /* Menyembunyikan input file standar */
+        }
+        
+        /* --- Gaya Tombol Edit/Hapus pada Kartu Produk --- */
+        .product-card-footer {
+            position: absolute; /* Menempatkan footer di atas gambar */
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.9); /* Latar belakang semi-transparan */
+            padding: 5px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: var(--text-dark);
+            min-height: 40px;
+        }
+
+        .product-card-footer span {
+            font-weight: 600;
+            display: block;
+        }
+
+        .product-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .product-actions a {
+            color: #666;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .product-actions a:hover {
+            color: var(--primary-blue); /* Contoh: Biru untuk Edit */
+        }
+
+        /* Gaya Khusus untuk Tombol Hapus (Merah) */
+        .product-actions a.delete-btn:hover {
+            color: var(--error-red); /* Merah untuk Hapus */
+        }
+
+
+        /* --- Footer --- */
+        .footer { background-color: var(--primary-blue); color: white; padding: 30px 50px; display: flex; justify-content: space-between; margin-top: auto; }
+        .footer-col { max-width: 300px; }
+        .footer-logo { font-size: 1.5em; font-weight: 700; }
+        .footer-links a { color: white; text-decoration: none; display: block; margin-bottom: 5px; font-size: 0.9em; }
+        .social-media a { color: white; font-size: 1.2em; margin-right: 15px; }
+        
+        /* Gaya Tombol Submit/Edit Profil (MERAH) */
+        .btn-submit { 
+            width: auto; 
+            padding: 10px 20px; 
+            background-color: var(--error-red); /* MERAH */
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1em; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: background-color 0.3s; 
+            margin-top: 20px;
+        }
+        .btn-submit:hover { 
+            background-color: #37b9ec; 
+        }
+        /* Akhir Gaya Tombol Submit/Edit Profil */
+        
+        .alert-not-registered {
+            padding: 20px;
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            border-radius: 5px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        /* --- Gaya Pop Up Konfirmasi Hapus --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none; /* Default: Tersembunyi */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+        }
+
+        .modal-content i {
+            color: var(--error-red);
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        /* Override untuk Pop Up Sukses */
+        #successModal .modal-content i {
+            color: #28a745; /* Hijau */
+        }
+
+        .modal-content h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0 5px;
+            transition: background-color 0.2s;
+        }
+
+        .modal-actions .btn-cancel {
+            background-color: #f0f0f0;
+            color: var(--text-dark);
+        }
+
+        .modal-actions .btn-delete {
+            background-color: var(--error-red);
+            color: white;
+        }
+
+        .modal-actions .btn-delete:hover {
+            background-color: #2386c8;
+        }
+          
+        .search-box input {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  width: 250px;
+  font-size: 14px;
+  outline: none;
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo-text"><i class="fas fa-shopping-cart" style="margin-right: 8px;"></i> LokaMart</div>
+            <div class="search-box">
+                 <input type="text" id="searchInput" placeholder="Cari barang atau toko..." />
+                <button><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        <div class="header-nav">
+            <a href="#"><i class="fas fa-bell"></i></a>
+            <a href="#"><i class="fas fa-user-circle"></i> Akun <i class="fas fa-caret-down"></i></a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        
+        <div id="dashboard-content">
+            <div class="page-container">
+                
+                <div class="dash-content">
+                    <div class="dash-left">
+                        <div class="dash-avatar-wrapper">
+                            <img id="dash-avatar-img" src="" alt="Avatar Toko">
+                        </div>
+                        <button class="btn-edit-foto" onclick="window.location.href='registrasi daftar toko.html'">Edit Foto</button> 
+                    </div>
+
+                    <div class="dash-info">
+                        <h2 id="dash-nama-toko">Nama Toko Anda</h2>
+                        
+                        <div style="margin-top: 15px;">
+                            <span style="font-size: 1.1em; font-weight: 600;">Deskripsi Toko</span>
+                            <p id="dash-deskripsi" style="margin-top: 5px;"></p>
+                          
+                        </div>
+
+                        <div class="dash-info-grid">
+                            <strong>Nama Toko</strong>
+                            <span id="dash-nama-toko-detail"></span>
+                            
+                            <strong>No WhatsApp</strong>
+                            <span id="dash-whatsapp"></span>
+                            
+                            <strong>Alamat</strong>
+                            <span id="dash-alamat"></span>
+
+                            <strong>Terdaftar</strong>
+                            <span id="dash-terdaftar"></span> 
+                        </div>
+                        
+                        <button class="btn-submit" onclick="window.location.href='registrasi daftar toko.html'">Edit Profil Toko</button>
+                    </div>
+                </div>
+
+                <div class="products-section">
+                    <h3>Produk Anda</h3>
+                    <div class="product-grid">
+                        <input type="file" id="product-image-upload" accept="image/*" multiple>
+
+                        <div class="product-card add-product-card" onclick="document.getElementById('product-image-upload').click();">
+                            <i class="fas fa-plus-circle" style="font-size: 2em; color: #aaa;"></i>
+                        </div>
+
+                        <div class="product-card" data-product-id="1">
+                            <img src="image/Nila.png" class="product-image-preview" alt="Nila">
+                            <div class="product-card-footer">
+                                <span>Nila</span>
+                                <div class="product-actions">
+                                    <span style="font-weight: normal;">Rp 25.000</span>
+                                    <a href="#"><i class="fas fa-edit"></i></a>
+                                    <a class="delete-btn" onclick="openDeleteModal(this)"><i class="fas fa-trash-alt"></i></a> 
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-card" data-product-id="2">
+                            <img src="image/gurame.png" class="product-image-preview" alt="Gurame">
+                            <div class="product-card-footer">
+                                <span>Gurame</span>
+                                <div class="product-actions">
+                                    <span style="font-weight: normal;">Rp 60.000</span>
+                                    <a href="#"><i class="fas fa-edit"></i></a>
+                                    <a class="delete-btn" onclick="openDeleteModal(this)"><i class="fas fa-trash-alt"></i></a> 
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-card" data-product-id="3">
+                            <img src="image/Lele.png" class="product-image-preview" alt="Gurami">
+                            <div class="product-card-footer">
+                                <span>Lele</span>
+                                <div class="product-actions">
+                                    <span style="font-weight: normal;">Rp 25.000</span>
+                                    <a href="#"><i class="fas fa-edit"></i></a>
+                                    <a class="delete-btn" onclick="openDeleteModal(this)"><i class="fas fa-trash-alt"></i></a> 
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="product-previews" style="display:contents;">
+                            </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <div class="footer-col">
+            <div class="footer-logo">LokaMart</div>
+            <a href="#">Kebijakan Privasi & Penggunaan</a>
+            <a href="#">Pusat Bantuan</a>
+            <p style="font-size: 0.9em; margin-top: 15px;">(025) 456-7890</p>
+            <div class="social-media" style="margin-top: 10px;">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+        <div class="footer-links">
+           <a href="Index.html" id="btnTentangKami">Beranda</a>
+            <a href="Tentang kami" id="btnTentangKami">Tentang Kami</a>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-content">
+            <i class="fas fa-trash-alt"></i>
+            <h4>Hapus Produk Ini?</h4>
+            <p>Anda yakin ingin menghapus <span id="product-to-delete-name"></span>?Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeDeleteModal()">Batal</button>
+                <button class="btn-delete" id="confirmDeleteBtn">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ==========================================================
+            // 1. FUNGSI MUAT DATA TOKO DARI LOCAL STORAGE (TETAP)
+            // ==========================================================
+            function loadStoreData() {
+                const dataString = localStorage.getItem('lokamart_store_data');
+                const data = dataString ? JSON.parse(dataString) : null;
+
+                const defaultAvatar = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22100%25%22%20height%3D%22100%25%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22%23e0e0e0%22%2F%3E%3Cpath%20d%3D%22M50%2055A20%2020%200%200%200%2050%2090%2020%2020%200%200%200%2050%2055Z%20M50%2010A20%2020%200%201%200%2050%2050A20%2020%200%201%200%2050%2010Z%22%20fill%3D%22%23aaa%22%2F%3E%3C%2Fsvg%3E';
+
+                if (data && data.namaToko) {
+                    // Update elemen Dashboard dengan data dari localStorage
+                    document.getElementById('dash-nama-toko').textContent = data.namaToko;
+                    document.getElementById('dash-nama-toko-detail').textContent = data.namaToko;
+                    document.getElementById('dash-deskripsi').textContent = data.deskripsi;
+                    document.getElementById('dash-whatsapp').textContent = data.whatsapp;
+                    document.getElementById('dash-alamat').textContent = data.alamat;
+                    document.getElementById('dash-terdaftar').textContent = data.terdaftar;
+                    document.getElementById('page-title').textContent = `${data.namaToko} | Dashboard Toko`;
+                    
+                    // Update Avatar Dashboard
+                    const dashAvatarImg = document.getElementById('dash-avatar-img');
+                    dashAvatarImg.src = data.avatar || defaultAvatar;
+
+                    document.getElementById('dashboard-content').style.display = 'block';
+
+                } else {
+                    // Jika data toko belum ada, tampilkan pesan registrasi
+                    const mainContent = document.querySelector('.main-content');
+                    mainContent.innerHTML = `
+                        <div class="alert-not-registered">
+                            <h3>⚠️ Toko Belum Terdaftar</h3>
+                            <p>Anda harus mendaftarkan toko terlebih dahulu sebelum mengakses dashboard.</p>
+                            <button class="btn-submit" onclick="window.location.href='registrasi.html'">Daftar Toko Sekarang</button>
+                        </div>
+                    `; 
+                    
+                    const footer = document.querySelector('.footer').outerHTML;
+                    document.body.insertAdjacentHTML('beforeend', footer);
+                    
+                    document.getElementById('page-title').textContent = 'Akses Ditolak | LokaMart';
+                }
+            }
+
+            // ==========================================================
+            // 2. FUNGSI PREVIEW GAMBAR PRODUK BARU (TETAP)
+            // ==========================================================
+            function previewImage(event) {
+                const files = event.target.files;
+                const previewContainer = document.getElementById('product-previews');
+                const addCard = document.querySelector('.add-product-card');
+
+                previewContainer.innerHTML = '';
+                
+                const productGrid = document.querySelector('.product-grid');
+                if (addCard && productGrid.firstChild !== addCard) {
+                    productGrid.prepend(addCard);
+                }
+                
+                if (files.length > 0) {
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        if (file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            
+                            reader.onload = function(e) {
+                                // Contoh sederhana: Nama produk sementara dan harga dummy
+                                const tempProductName = 'Produk Baru';
+                                const tempPrice = 'Rp 0';
+                                
+                                // Buat elemen div card baru untuk gambar preview
+                                const card = document.createElement('div');
+                                card.className = 'product-card';
+                                card.setAttribute('data-product-id', `temp-${Date.now() + i}`); // ID sementara
+
+                                // Gambar
+                                const img = document.createElement('img');
+                                img.className = 'product-image-preview';
+                                img.src = e.target.result;
+                                img.alt = file.name;
+
+                                // Footer (dengan tombol Edit dan Hapus)
+                                const footerHTML = `
+                                    <div class="product-card-footer">
+                                        <span>${tempProductName}</span>
+                                        <div class="product-actions">
+                                            <span style="font-weight: normal;">${tempPrice}</span>
+                                            <a href="#"><i class="fas fa-edit"></i></a>
+                                            <a class="delete-btn" onclick="openDeleteModal(this)"><i class="fas fa-trash-alt"></i></a>
+                                        </div>
+                                    </div>
+                                `;
+
+                                card.appendChild(img);
+                                card.insertAdjacentHTML('beforeend', footerHTML);
+
+                                previewContainer.appendChild(card);
+                            };
+                            
+                            reader.readAsDataURL(file);
+                        }
+                    }
+                }
+                event.target.value = null; 
+            }
+            
+            // ==========================================================
+            // 3. FUNGSI POP UP HAPUS PRODUK (BARU)
+            // ==========================================================
+            window.productToDeleteElement = null; // Variabel global untuk menyimpan elemen kartu yang akan dihapus
+
+            window.openDeleteModal = function(deleteButton) {
+                // Mendapatkan elemen kartu produk (div.product-card)
+                const productCard = deleteButton.closest('.product-card');
+                
+                // Mendapatkan nama produk dari elemen span di dalam footer
+                const productName = productCard.querySelector('.product-card-footer span').textContent;
+                
+                // Simpan elemen produk yang akan dihapus ke variabel global
+                window.productToDeleteElement = productCard; 
+
+                // Tampilkan nama produk di Pop Up
+                document.getElementById('product-to-delete-name').textContent = productName;
+                
+                // Tampilkan modal
+                document.getElementById('deleteModal').style.display = 'flex';
+            }
+
+            window.closeDeleteModal = function() {
+                document.getElementById('deleteModal').style.display = 'none';
+                window.productToDeleteElement = null; // Reset variabel global
+            }
+
+            window.confirmDelete = function() {
+                if (window.productToDeleteElement) {
+                    // Hapus elemen kartu produk dari DOM
+                    const productName = window.productToDeleteElement.querySelector('.product-card-footer span').textContent;
+                    window.productToDeleteElement.remove();
+                    
+                    // Tampilkan Pop Up "Produk berhasil dihapus" (simulasi)
+                    simulateDeleteSuccess(productName);
+                    
+                    // Tutup modal konfirmasi
+                    closeDeleteModal();
+                }
+            }
+
+            window.simulateDeleteSuccess = function(productName) {
+                // Buat modal sukses (sesuai gambar preview)
+                const successModalHTML = `
+                    <div id="successModal" class="modal-overlay" style="display:flex;">
+                        <div class="modal-content" style="max-width: 300px;">
+                            <i class="fas fa-check-circle" style="color: green; font-size: 3em;"></i>
+                            <h4 style="color: green;">Berhasil!</h4>
+                     <p style="margin-bottom: 0;">Produk ${productName} berhasil dihapus.</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Tambahkan ke body
+                document.body.insertAdjacentHTML('beforeend', successModalHTML);
+                
+                // Sembunyikan pop up sukses setelah 2 detik
+                setTimeout(() => {
+                    const successModal = document.getElementById('successModal');
+                    if (successModal) {
+                        successModal.remove();
+                    }
+                }, 2000);
+            }
+            
+            // Tambahkan event listener untuk tombol konfirmasi Hapus
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmBtn) {
+                 confirmBtn.addEventListener('click', confirmDelete);
+            }
+            // ==========================================================
+            
+            // Panggil fungsi saat halaman Dashboard dimuat
+            loadStoreData();
+
+            // Tambahkan event listener untuk input file
+            const fileInput = document.getElementById('product-image-upload');
+            if (fileInput) {
+                fileInput.addEventListener('change', previewImage);
+            }
+        });
+    </script>
+</body>
+<script>
+  // Saat pengguna tekan Enter di kolom pencarian
+  document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const query = this.value.trim();
+
+      // Arahkan ke halaman daftar.html dengan query pencarian
+      if (query !== "") {
+        window.location.href = `daftar.html?search=${encodeURIComponent(query)}`;
+      }
+    }
+  });
+</script>
+</html>
